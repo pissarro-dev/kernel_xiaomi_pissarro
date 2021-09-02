@@ -4145,6 +4145,12 @@ static int __init __mt_gpufreq_mfgpll_init(void)
 	return ret;
 }
 
+/* API : get immediate gpu temperature */
+int mt_gpufreq_get_immed_gpu_temp(void)
+{
+	return get_immediate_gpu_wrap();
+}
+
 arch_initcall_sync(__mt_gpufreq_mfgpll_init);
 module_init(__mt_gpufreq_init);
 module_exit(__mt_gpufreq_exit);
