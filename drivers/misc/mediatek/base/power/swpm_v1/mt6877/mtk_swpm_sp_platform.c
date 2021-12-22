@@ -124,7 +124,7 @@ static void swpm_sp_internal_update(void)
 	}
 }
 
-static void swpm_sp_routine(unsigned long data)
+static void swpm_sp_routine(struct timer_list *data)
 {
 	unsigned long flags;
 
@@ -263,12 +263,9 @@ static struct swpm_internal_ops plat_ops = {
 /* critical section function */
 static void swpm_sp_timer_init(void)
 {
-	swpm_sp_timer.function = swpm_sp_routine;
 	swpm_sp_timer.expires =
 		jiffies + msecs_to_jiffies(update_interval_ms);
-	swpm_sp_timer.data = 0;
-	init_timer_deferrable(&swpm_sp_timer);
-	add_timer(&swpm_sp_timer);
+	timer_setup(&swpm_sp_timer, swpm_sp_routine, 0);
 }
 
 #if SWPM_INTERNAL_TEST
