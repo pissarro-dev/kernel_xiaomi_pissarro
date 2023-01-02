@@ -253,8 +253,8 @@ struct ion_mm_data {
 
 #ifdef __KERNEL__
 #define ION_LOG_TAG "ion_dbg"
-#define IONMSG(string, args...)	pr_err("[ION]"string, ##args)
-#define IONDBG(string, args...)	pr_debug("[ION]"string, ##args)
+#define IONMSG(string, args...)        pr_debug("[ION]" string, ##args)
+#define IONDBG(string, args...)        pr_debug("[ION]" string, ##args)
 
 /* Exported global variables */
 extern struct ion_device *g_ion_device;
