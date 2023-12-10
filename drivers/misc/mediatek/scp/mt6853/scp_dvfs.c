@@ -640,16 +640,25 @@ static int mt_scp_state_proc_show(struct seq_file *m, void *v)
 	unsigned int scp_state;
 
 	scp_state = readl(SCP_A_SLEEP_DEBUG_REG);
-	seq_printf(m, "scp status: %s\n",
-		((scp_state & IN_DEBUG_IDLE) == IN_DEBUG_IDLE) ? "idle mode"
-		: ((scp_state & ENTERING_SLEEP) == ENTERING_SLEEP) ?
-			"enter sleep"
-		: ((scp_state & IN_SLEEP) == IN_SLEEP) ?
-			"sleep mode"
-		: ((scp_state & ENTERING_ACTIVE) == ENTERING_ACTIVE) ?
-			"enter active"
-		: ((scp_state & IN_ACTIVE) == IN_ACTIVE) ?
-			"active mode" : "none of state");
+	switch (scp_state) {
+		case IN_DEBUG_IDLE:
+			seq_printf(m, "scp status: idle mode\n");
+			break;
+		case ENTERING_SLEEP:
+			seq_printf(m, "scp status: enter sleep\n");
+			break;
+		case IN_SLEEP:
+			seq_printf(m, "scp status: sleep mode\n");
+			break;
+		case ENTERING_ACTIVE:
+			seq_printf(m, "scp status: enter active\n");
+			break;
+		case IN_ACTIVE:
+			seq_printf(m, "scp status: active mode\n");
+			break;
+		default:
+			seq_printf(m, "scp status: none of state\n");
+	}
 	return 0;
 }
 
