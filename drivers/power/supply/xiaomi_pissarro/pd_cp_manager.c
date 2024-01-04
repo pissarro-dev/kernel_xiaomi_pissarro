@@ -1186,16 +1186,6 @@ static int pd_policy_parse_dt(struct usbpd_pm *pdpm)
 	rc = of_property_read_u32(node, "max_bbc_vbus", &pdpm->dts_config.max_bbc_vbus);
 	rc = of_property_read_u32(node, "min_bbc_vbus", &pdpm->dts_config.min_bbc_vbus);
 
-#ifdef CONFIG_FACTORY_BUILD
-	if (product_name == PISSARRO) {
-		vbus_low_gap_div += 200;
-		vbus_high_gap_div += 200;
-	} else if (product_name == PISSARROPRO) {
-		vbus_low_gap_div += 200;
-		vbus_high_gap_div += 200;
-	}
-#endif
-
 	pdm_info("parse config, FV = %d, FV_FFC = %d, FCC = [%d %d %d], MAX_VBUS = %d, MAX_IBUS = %d, CV = [%d %d %d], ENTRY = [%d %d %d %d], PDO_GAP = [%d %d %d %d %d %d]\n",
 			pdpm->dts_config.fv, pdpm->dts_config.fv_ffc, pdpm->dts_config.max_fcc, pdpm->dts_config.fcc_low_hyst, pdpm->dts_config.fcc_high_hyst,
 			pdpm->dts_config.max_vbus, pdpm->dts_config.max_ibus, pdpm->dts_config.cv_vbat, pdpm->dts_config.cv_vbat_ffc, pdpm->dts_config.cv_ibat,

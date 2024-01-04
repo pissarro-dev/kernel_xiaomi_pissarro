@@ -1857,9 +1857,6 @@ static int goodix_ts_suspend(struct goodix_ts_core *core_data)
 
 	ts_info("Suspend start");
 	wakeup_complete = false;
-#ifdef CONFIG_FACTORY_BUILD
-	core_data->gesture_enabled = 0;
-#endif
 
 	/*
 	 * notify suspend event, inform the esd protector
@@ -1965,10 +1962,6 @@ static int goodix_ts_resume(struct goodix_ts_core *core_data)
 	}
 	ts_info("Resume start");
 	us = 3*1000*1000;
-
-#ifdef CONFIG_FACTORY_BUILD
-	core_data->gesture_enabled = 1;
-#endif
 
 	goodix_ts_power_on(core_data);
 
@@ -3236,12 +3229,6 @@ static int goodix_ts_probe(struct platform_device *pdev)
 	xiaomi_touch_interfaces.palm_sensor_write = goodix_palm_sensor_write;
 	xiaomitouch_register_modedata(0, &xiaomi_touch_interfaces); 
 	gtp_init_touchmode_data();
-#endif
-
-#ifdef CONFIG_FACTORY_BUILD
-	ts_info("init fod status in FAC.");
-	core_data->fod_status = 1;
-	core_data->gesture_enabled = 1;
 #endif
 
 #ifdef CONFIG_TOUCHSCREEN_FOD

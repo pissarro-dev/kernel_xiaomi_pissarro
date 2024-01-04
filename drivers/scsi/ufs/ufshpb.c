@@ -37,9 +37,6 @@
 
 #include "ufshcd.h"
 #include "ufshpb.h"
-#if defined(CONFIG_UFS_CHECK) && defined(CONFIG_FACTORY_BUILD)
-#include "ufs-check.h"
-#endif
 
 #define UFSHCD_REQ_SENSE_SIZE	18
 
@@ -3044,9 +3041,6 @@ void ufshpb_get_lu_info(struct ufsf_feature *ufsf, int lun, u8 *unit_buf)
 		hpb->lu_pinned_rgn_startidx =
 			lu_desc.lu_hpb_pinned_rgn_startidx;
 		hpb->lu_pinned_end_offset = lu_desc.lu_hpb_pinned_end_offset;
-#if defined(CONFIG_UFS_CHECK) && defined(CONFIG_FACTORY_BUILD)
-		fill_hpb_gb(ufsf->hba, lu_desc.lu_max_active_hpb_rgns, ufsf->hpb_dev_info.rgn_size);
-#endif
 	} else {
 		INFO_MSG("===== LU (%d) is hpb-disabled.", lun);
 	}

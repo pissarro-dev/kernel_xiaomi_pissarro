@@ -39,10 +39,6 @@
 #include "ufstw.h"
 #include "ufs_quirks.h"
 
-#if defined(CONFIG_UFS_CHECK) && defined(CONFIG_FACTORY_BUILD)
-#include "ufs-check.h"
-#endif
-
 static int ufstw_create_sysfs(struct ufsf_feature *ufsf, struct ufstw_lu *tw);
 
 inline int ufstw_get_state(struct ufsf_feature *ufsf)
@@ -359,11 +355,6 @@ void ufstw_get_geo_info(struct ufsf_feature *ufsf, u8 *geo_buf)
 		return;
 	}
 
-#if defined(CONFIG_UFS_CHECK) && defined(CONFIG_FACTORY_BUILD)
-	tw_dev_info->seg_size = LI_EN_32(&geo_buf[GEOMETRY_DESC_SEGMENT_SIZE]);
-	tw_dev_info->unit_size = geo_buf[GEOMETRY_DESC_UNIT_SIZE];
-#endif
-
 	INFO_MSG("tw_geo [4F:52] dTurboWriteBufferMaxNAllocUnits (%u)",
 		 LI_EN_32(&geo_buf[GEOMETRY_DESC_TW_MAX_SIZE]));
 	INFO_MSG("tw_geo [53] bDeviceMaxTurboWriteLUs (%u)",
@@ -388,13 +379,6 @@ static void ufstw_alloc_shared_lu(struct ufsf_feature *ufsf)
 	tw->lun = TW_LU_SHARED;
 	tw->ufsf = ufsf;
 	ufsf->tw_lup[0] = tw;
-#if defined(CONFIG_UFS_CHECK) && defined(CONFIG_FACTORY_BUILD)
-	if (lu_desc.tw_lu_buf_size)
-		fill_wb_gb(ufsf->hba, ufsf->tw_dev_info.seg_size, ufsf->tw_dev_info.unit_size, lu_desc.tw_lu_buf_size);
-	else
-		INFO_MSG("ufstw_lu[%d] [29:2C] dLUNumTWBufferAllocUnits_err (%u)",
-			 lun, lu_desc.tw_lu_buf_size);
-#endif
 	INFO_MSG("ufstw_lu[shared] is TurboWrite-Enabled");
 }
 
@@ -419,9 +403,6 @@ static void ufstw_get_lu_info(struct ufsf_feature *ufsf, int lun, u8 *lu_buf)
 		tw = ufsf->tw_lup[lun];
 		tw->ufsf = ufsf;
 		tw->lun = lun;
-#if defined(CONFIG_UFS_CHECK) && defined(CONFIG_FACTORY_BUILD)
-		fill_wb_gb(ufsf->hba, ufsf->tw_dev_info.seg_size, ufsf->tw_dev_info.unit_size, lu_desc.tw_lu_buf_size);
-#endif
 		INFO_MSG("ufstw_lu[%d] [29:2C] dLUNumTWBufferAllocUnits (%u)",
 			 lun, lu_desc.tw_lu_buf_size);
 		INFO_MSG("ufstw_lu[%d] is TurboWrite-Enabled.", lun);

@@ -317,11 +317,9 @@ static struct device_attribute power_supply_attrs[] = {
 	POWER_SUPPLY_ATTR(input_suspend),
 	POWER_SUPPLY_ATTR(jeita_chg_index),
 	POWER_SUPPLY_ATTR(cv_wa_count),
-#ifdef CONFIG_FACTORY_BUILD
 	POWER_SUPPLY_ATTR(cp_vbus),
 	POWER_SUPPLY_ATTR(cp_ibus_master),
 	POWER_SUPPLY_ATTR(cp_ibus_slave),
-#endif
 
 	/* only for battery */
 	POWER_SUPPLY_ATTR(thermal_limit_fcc),

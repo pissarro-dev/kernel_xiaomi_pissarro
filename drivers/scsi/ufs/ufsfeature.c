@@ -39,12 +39,6 @@
 #include "ufshcd.h"
 #include "ufs_quirks.h"
 
-
-#if defined(CONFIG_UFS_CHECK) && defined(CONFIG_FACTORY_BUILD)
-#include <asm/unaligned.h>
-#include "ufs-check.h"
-#endif
-
 #define QUERY_REQ_TIMEOUT				1500 /* msec */
 
 static inline void ufsf_init_query(struct ufs_hba *hba,
@@ -250,10 +244,6 @@ static int ufsf_read_geo_desc(struct ufsf_feature *ufsf, u8 selector)
 			     geo_buf, UFSF_QUERY_DESC_GEOMETRY_MAX_SIZE);
 	if (ret)
 		return ret;
-#if defined(CONFIG_UFS_CHECK) && defined(CONFIG_FACTORY_BUILD)
-	total_size = get_unaligned_be64(&geo_buf[0x04]);
-	fill_total_gb(ufsf->hba, total_size);
-#endif
 #if defined(CONFIG_UFSHPB)
 	if (ufshpb_get_state(ufsf) == HPB_NEED_INIT)
 		ufshpb_get_geo_info(ufsf, geo_buf);
@@ -281,11 +271,6 @@ static void ufsf_read_unit_desc(struct ufsf_feature *ufsf, int lun, u8 selector)
 	lu_enable = unit_buf[UNIT_DESC_PARAM_LU_ENABLE];
 	if (!lu_enable)
 		return;
-#if defined(CONFIG_UFS_CHECK) && defined(CONFIG_FACTORY_BUILD)
-	else if (lun == 2 && lu_enable != 2)
-		check_hpb_and_tw_provsion(ufsf->hba);
-#endif
-
 #if defined(CONFIG_UFSHPB)
 	if (ufshpb_get_state(ufsf) == HPB_NEED_INIT)
 		ufshpb_get_lu_info(ufsf, lun, unit_buf);
@@ -294,13 +279,6 @@ static void ufsf_read_unit_desc(struct ufsf_feature *ufsf, int lun, u8 selector)
 #if defined(CONFIG_UFSTW)
 	if (ufstw_get_state(ufsf) == TW_NEED_INIT)
 		ufstw_alloc_lu(ufsf, lun, unit_buf);
-#endif
-
-#if defined(CONFIG_UFS_CHECK) && defined(CONFIG_FACTORY_BUILD)
-	if (lun == 2 && ufsf->hba->card->wmanufacturerid != UFS_VENDOR_SKHYNIX) {
-		if (check_wb_hpb_size(ufsf->hba) == -1)
-			check_hpb_and_tw_provsion(ufsf->hba);
-	}
 #endif
 
 out:

@@ -35,15 +35,7 @@
 #include <linux/slab.h>
 #include "s5khm2sd_sunny_mipi_raw_Sensor.h"
 
-#ifdef CONFIG_FACTORY_BUILD
-
-#define ENABLE_PDAF 0
-
-#else
-
 #define ENABLE_PDAF 1
-
-#endif
 
 #define EEPROM_SLAVE_ID 0xA2
 // common register

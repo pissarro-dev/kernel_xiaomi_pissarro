@@ -897,10 +897,6 @@ static int cs35l41_otp_unpack(void *data)
 	}
 
 	for (i = 0; i < otp_map_match->num_elements; i++) {
-		#ifndef CONFIG_FACTORY_BUILD
-		dev_dbg(cs35l41->dev, "bitoffset= %d, word_offset=%d, bit_sum mod 32=%d\n",
-					bit_offset, word_offset, bit_sum % 32);
-		#endif
 		if (bit_offset + otp_map[i].size - 1 >= 32) {
 			otp_val = (otp_mem[word_offset] &
 					GENMASK(31, bit_offset)) >>
