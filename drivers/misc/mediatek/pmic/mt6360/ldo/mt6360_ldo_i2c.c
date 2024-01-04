@@ -31,11 +31,7 @@ module_param(dbg_log_en, bool, 0644);
 
 static const struct mt6360_ldo_platform_data def_platform_data = {
 	.sdcard_det_en = true,
-#ifdef CONFIG_SD_PISSARRO
-	.sdcard_hlact = false,
-#else
 	.sdcard_hlact = true,
-#endif
 };
 
 struct mt6360_regulator_desc {
