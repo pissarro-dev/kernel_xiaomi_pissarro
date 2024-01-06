@@ -41,7 +41,6 @@
 #include <linux/pm_qos.h>
 #include <linux/proc_fs.h>
 
-#include "../xiaomi/xiaomi_touch.h"
 #ifdef CONFIG_OF
 #include <linux/of_gpio.h>
 #include <linux/regulator/consumer.h>
@@ -510,12 +509,6 @@ struct goodix_ts_core {
 
 #ifdef CONFIG_DRM
 	struct notifier_block fb_notifier;
-#endif
-
-#ifdef CONFIG_TOUCHSCREEN_XIAOMI_TOUCHFEATURE
-	bool gamemode_on;
-	bool palmsensor_on;
-	int palmsensor_val;
 #endif
 
 #ifdef CONFIG_TOUCHSCREEN_FOD
