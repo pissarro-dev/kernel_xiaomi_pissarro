@@ -6,6 +6,7 @@
 #ifndef _MI_DISP_CORE_H_
 #define _MI_DISP_CORE_H_
 
+#include <linux/device.h>
 #include "mi_disp_config.h"
 
 #define MI_DISPLAY_CLASS  "mi_display"
