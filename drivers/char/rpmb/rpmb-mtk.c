@@ -132,6 +132,9 @@ do {\
 #define RPMB_DATA_BUFF_SIZE (1024 * 24)
 #define RPMB_ONE_FRAME_SIZE (512)
 static unsigned char *rpmb_buffer;
+#endif
+
+#ifdef CONFIG_MITEE
 bool use_mitee = true;
 #endif
 
@@ -2733,7 +2736,9 @@ long rpmb_ioctl_ufs(struct file *file, unsigned int cmd, unsigned long arg)
 #if (defined(CONFIG_MICROTRUST_TEE_SUPPORT) || defined(CONFIG_MITEE))
 	if ((cmd == RPMB_IOCTL_SOTER_WRITE_DATA) ||
 		(cmd == RPMB_IOCTL_SOTER_READ_DATA) ||
+#ifdef CONFIG_MITEE
 		((cmd == RPMB_IOCTL_SOTER_GET_CNT) && use_mitee) ||
+#endif
 		(cmd == RPMB_IOCTL_SOTER_SET_KEY)) {
 		if (rpmb_buffer == NULL) {
 			MSG(ERR, "%s, rpmb_buffer is NULL!\n", __func__);
@@ -2876,22 +2881,22 @@ long rpmb_ioctl_ufs(struct file *file, unsigned int cmd, unsigned long arg)
 
 		MSG(DBG_INFO, "%s, cmd = RPMB_IOCTL_SOTER_GET_CNT\n", __func__);
 
-		if (use_mitee)
-			err = rpmb_req_get_wc_ufs(NULL, NULL, rpmbinfor.data_frame);
-		else
-			err = rpmb_req_get_wc_ufs(NULL, &arg_k, NULL);
+#ifdef CONFIG_MITEE
+		err = rpmb_req_get_wc_ufs(NULL, NULL, rpmbinfor.data_frame);
+#else
+		err = rpmb_req_get_wc_ufs(NULL, &arg_k, NULL);
+#endif
 		if (err) {
 			MSG(ERR,
 	"%s, Microtrust get rpmb write counter failed, error code (%x)\n",
 				__func__, err);
 			return err;
 		}
-
-		if (use_mitee)
-			err = copy_to_user((void *)arg, rpmb_buffer, 4 + rpmbinfor.size);
-		else
-			err = copy_to_user((void *)arg, &arg_k, sizeof(u32));
-
+#ifdef CONFIG_MITEE
+		err = copy_to_user((void *)arg, rpmb_buffer, 4 + rpmbinfor.size);
+#else
+		err = copy_to_user((void *)arg, &arg_k, sizeof(u32));
+#endif
 		if (err) {
 			MSG(ERR, "%s, copy_to_user failed: %x\n",
 				__func__, err);
@@ -3282,7 +3287,7 @@ static int __init rpmb_init(void)
 	struct device *device = NULL;
 	int boot_type;
 
-#if (defined(CONFIG_MICROTRUST_TEE_SUPPORT) || defined(CONFIG_MITEE))
+#ifdef CONFIG_MITEE
 	char mode = 0;
 	char *ptr = NULL;
 #endif
@@ -3335,7 +3340,7 @@ static int __init rpmb_init(void)
 		MSG(ERR, "%s, init kthread_run failed!\n", __func__);
 #endif
 
-#if (defined(CONFIG_MICROTRUST_TEE_SUPPORT) || defined(CONFIG_MITEE))
+#ifdef CONFIG_MITEE
 	ptr = strstr(saved_command_line, "androidboot.tee_type=");
 	if (ptr) {
 		mode = *(ptr + strlen("androidboot.tee_type="));
@@ -3344,6 +3349,9 @@ static int __init rpmb_init(void)
 		use_mitee = true;
 	}
 	MSG(INFO, "%s, use_mitee is %d\n", __func__, use_mitee);
+#endif
+
+#if (defined(CONFIG_MICROTRUST_TEE_SUPPORT) || defined(CONFIG_MITEE))
 	rpmb_buffer = kzalloc(RPMB_DATA_BUFF_SIZE, 0);
 	if (rpmb_buffer == NULL) {
 		MSG(ERR, "%s, rpmb kzalloc memory fail!!!\n", __func__);
