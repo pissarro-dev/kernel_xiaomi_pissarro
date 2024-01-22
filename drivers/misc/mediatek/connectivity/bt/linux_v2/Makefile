@@ -25,7 +25,6 @@ ccflags-y += -I$(src)/../../wlan_sdio_reset.ko_intermediates/LINKED/reset/includ
 ccflags-y += -I$(src)/../../wlan/core/gen4-mt79xx/reset/include/
 
 RESET_DIR = $(shell pwd)/../../ETC/wlan_sdio_reset.ko_intermediates/LINKED/Module.symvers
-$(info 'RESET_DIR=' $(RESET_DIR))
 KBUILD_EXTRA_SYMBOLS += $(RESET_DIR)
 endif
 

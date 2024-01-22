@@ -8,8 +8,6 @@ hif=pcie
 include $(srctree)/$(src)/Makefile.x86
 src:=$(srctree)/$(shell echo ${src})
 MTK_COMBO_CHIP=MT7961
-$(info Kbuild chip: $(MTK_COMBO_CHIP))
-$(info Kbuild hif : $(CONFIG_MTK_COMBO_WIFI_HIF))
 endif
 endif
 endif
@@ -29,7 +27,6 @@ ccflags-y += -DCFG_VIRTUAL_OS
 ccflags-y += -DCFG_REMIND_IMPLEMENT
 endif
 
-$(info os option: $(os))
 
 # script for check the kernel version condition
 # example check kernel >= 5.4 : $(call kver_ge,5,4)
@@ -69,12 +66,10 @@ MTK_COMBO_CHIP = MT6632
 endif
 
 MTK_PLATFORM := $(subst ",,$(CONFIG_MTK_PLATFORM))
-$(info $$MTK_PLATFORM is [${MTK_PLATFORM}])
 
 ifeq ($(WLAN_CHIP_ID),)
 WLAN_CHIP_ID=$(word 1, $(MTK_COMBO_CHIP))
 endif
-$(info $$WLAN_CHIP_ID is [${WLAN_CHIP_ID}])
 
 ccflags-y += -DCFG_SUPPORT_DEBUG_FS=0
 ccflags-y += -DWLAN_INCLUDE_PROC
@@ -598,13 +593,11 @@ endif
 
 ifneq ($(CFG_CFG80211_VERSION),)
 VERSION_STR = $(subst \",,$(subst ., , $(subst -, ,$(subst v,,$(CFG_CFG80211_VERSION)))))
-$(info VERSION_STR=$(VERSION_STR))
 X = $(firstword $(VERSION_STR))
 Y = $(word 2 ,$(VERSION_STR))
 Z = $(word 3 ,$(VERSION_STR))
 VERSION := $(shell echo "$$(( $X * 65536 + $Y * 256 + $Z))" )
 ccflags-y += -DCFG_CFG80211_VERSION=$(VERSION)
-$(info DCFG_CFG80211_VERSION=$(VERSION))
 endif
 
 
@@ -1265,7 +1258,6 @@ SERVICE_DIR  := wlan_service/
 ifneq ($(findstring wlan_service,$(MTK_WLAN_SERVICE_PATH)),)
 MTK_WLAN_SERVICE=yes
 SERVICE_DIR  := $(MTK_WLAN_SERVICE_PATH)
-$(info SERVICE_DIR is [{$(MTK_WLAN_SERVICE_PATH)}])
 endif
 
 ifeq ($(MTK_WLAN_SERVICE), yes)
@@ -1275,7 +1267,6 @@ ccflags-y += -I$(src)/$(SERVICE_DIR)include
 ccflags-y += -I$(src)/$(SERVICE_DIR)service/include
 ccflags-y += -I$(src)/$(SERVICE_DIR)glue/osal/include
 ccflags-y += -I$(src)/$(SERVICE_DIR)glue/hal/include
-$(info $$CCFLAG is [{$(ccflags-y)}])
 SERVICE_OBJS := $(SERVICE_DIR)agent/agent.o \
                 $(SERVICE_DIR)service/service_test.o \
                 $(SERVICE_DIR)service/test_engine.o \
@@ -1283,7 +1274,6 @@ SERVICE_OBJS := $(SERVICE_DIR)agent/agent.o \
                 $(SERVICE_DIR)glue/osal/gen4m/net_adaption_gen4m.o \
                 $(SERVICE_DIR)glue/hal/gen4m/operation_gen4m.o
 $(MODULE_NAME)-objs  += $(SERVICE_OBJS)
-$(info $$MTK_WLAN_SERVICE is [{$(SERVICE_OBJS)}])
 else
 ccflags-y += -DCONFIG_WLAN_SERVICE=0
 ccflags-y += -DCONFIG_TEST_ENGINE_OFFLOAD=0

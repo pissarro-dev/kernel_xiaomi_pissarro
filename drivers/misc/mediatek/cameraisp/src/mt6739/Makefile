@@ -31,4 +31,3 @@ else
 endif
 
 
-$(info cameraisp drv by platform $(platform_drv))
