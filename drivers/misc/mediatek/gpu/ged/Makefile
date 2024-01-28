@@ -28,12 +28,14 @@ ccflags-y += -DMTK_GED_KPI
 ccflags-y += -DGED_KPI_CPU_BOOST
 
 ifeq ($(CONFIG_MTK_GPU_COMMON_DVFS_SUPPORT),y)
+ged-y += src/ged_ski.o
 ccflags-y += -DGED_ENABLE_FB_DVFS
 ccflags-y += -DGED_ENABLE_DYNAMIC_DVFS_MARGIN
 ccflags-y += -DGED_CONFIGURE_LOADING_BASE_DVFS_STEP
 ccflags-y += -DGED_ENABLE_TIMER_BASED_DVFS_MARGIN
 ccflags-y += -DGED_ENABLE_DVFS_LOADING_MODE
 ccflags-y += -DMTK_CPUFREQ
+ccflags-y += -DGED_SKI_SUPPORT
 endif
 
 ccflags-y += -I$(srctree)/drivers/misc/mediatek/cmdq/v3
@@ -54,16 +56,17 @@ ccflags-y += -DMTK_GPUFREQ_V1
 #ccflags-y += -DGED_KPI_MET_DEBUG
 ccflags-y += -DMTK_GED_KPI
 ccflags-y += -DGED_KPI_CPU_BOOST
-ccflags-y += -DGED_SKI_SUPPORT
-ged-y += src/ged_ski.o
 
 ifeq ($(CONFIG_MTK_GPU_COMMON_DVFS_SUPPORT),y)
+ged-y += src/ged_ski.o
 ccflags-y += -DGED_ENABLE_FB_DVFS
 ccflags-y += -DGED_ENABLE_DYNAMIC_DVFS_MARGIN
 ccflags-y += -DGED_CONFIGURE_LOADING_BASE_DVFS_STEP
 ccflags-y += -DGED_ENABLE_TIMER_BASED_DVFS_MARGIN
 ccflags-y += -DMTK_CPUFREQ
 ccflags-y += -DGED_ENABLE_DVFS_LOADING_MODE
+ccflags-y += -DGED_SKI_SUPPORT
+$(info $$GED: CONFIG_MTK_GPU_COMMON_DVFS_SUPPORT is defined [${CONFIG_MTK_GPU_COMMON_DVFS_SUPPORT}])
 endif
 
 ccflags-y += -I$(srctree)/drivers/misc/mediatek/cmdq/v3
@@ -196,11 +199,13 @@ ccflags-y += -DMTK_GED_KPI
 ccflags-y += -DGED_KPI_CPU_BOOST
 
 ifeq ($(CONFIG_MTK_GPU_COMMON_DVFS_SUPPORT),y)
+ged-y += src/ged_ski.o
 ccflags-y += -DGED_ENABLE_FB_DVFS
 ccflags-y += -DGED_ENABLE_DYNAMIC_DVFS_MARGIN
 ccflags-y += -DGED_CONFIGURE_LOADING_BASE_DVFS_STEP
 ccflags-y += -DGED_ENABLE_TIMER_BASED_DVFS_MARGIN
 ccflags-y += -DMTK_CPUFREQ
+ccflags-y += -DGED_SKI_SUPPORT
 endif
 
 ccflags-y += -DCONFIG_MTK_QOS_V1_SUPPORT
