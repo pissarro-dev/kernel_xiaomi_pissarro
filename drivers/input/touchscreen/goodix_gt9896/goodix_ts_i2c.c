@@ -1754,10 +1754,6 @@ static int goodix_event_handler(struct goodix_ts_device *dev,
 	if (unlikely(r < 0))
 		return r;
 
-#ifdef CONFIG_TOUCHSCREEN_XIAOMI_TOUCHFEATURE
-	core_data->palmsensor_val = (pre_buf[2] & GOODIX_LRAGETOUCH_EVENT);
-#endif
-
 #ifdef DEBUG_STABILITY_ENABLE
 	read_end_time = ktime_get_boot_ns();
 	/* if((read_end_time - read_start_time) > 500000) */
@@ -1797,18 +1793,6 @@ static int goodix_event_handler(struct goodix_ts_device *dev,
 		ts_debug("unknow event type:0x%x", event_sta);
 		r = -EINVAL;
 	}
-
-#ifdef CONFIG_TOUCHSCREEN_XIAOMI_TOUCHFEATURE
-	if (core_data->palmsensor_on) {
-		if (core_data->palmsensor_val) {
-			update_palm_sensor_value(1);
-			return r;
-		} else {
-			update_palm_sensor_value(0);
-		}
-	}
-#endif
-
 	return r;
 }
 
