@@ -2077,7 +2077,7 @@ static kal_uint32 streaming_control(kal_bool enable)
 }
 
 #include "../../../../../sensor/2.0/mtk_nanohub/mtk_nanohub.h"
-extern mtk_nanohub_set_cmd_to_hub(uint8_t sensor_id, enum CUST_ACTION action, void *data);
+extern int mtk_nanohub_set_cmd_to_hub(uint8_t sensor_id, enum CUST_ACTION action, void *data);
 static kal_uint32 exposure_for_gyroscope()
 {
 	//use vendor name distinguish gyroscope
