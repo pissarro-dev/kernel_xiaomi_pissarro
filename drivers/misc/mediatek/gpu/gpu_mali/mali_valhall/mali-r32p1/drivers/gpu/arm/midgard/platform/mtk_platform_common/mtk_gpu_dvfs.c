@@ -17,10 +17,12 @@
 #include <backend/gpu/mali_kbase_pm_defs.h>
 #include "mtk_gpu_dvfs.h"
 
+#if IS_ENABLED(CONFIG_MALI_MIDGARD_DVFS) && IS_ENABLED(CONFIG_MTK_GPU_COMMON_DVFS)
 static unsigned int current_util_active;
 static unsigned int current_util_3d;
 static unsigned int current_util_ta;
 static unsigned int current_util_compute;
+#endif
 
 #if IS_ENABLED(CONFIG_MALI_MIDGARD_DVFS) && IS_ENABLED(CONFIG_MTK_GPU_COMMON_DVFS)
 void mtk_common_ged_dvfs_commit(unsigned long ui32NewFreqID,
