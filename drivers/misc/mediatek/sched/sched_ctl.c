@@ -35,6 +35,8 @@
 
 #define SCHED_HINT_THROTTLE_NSEC 10000000 /* 10ms for throttle */
 
+static DEFINE_MUTEX(boost_mutex);
+
 struct sched_hint_data {
 	struct task_struct *task;
 	struct irq_work irq_work;
@@ -720,12 +722,46 @@ void sched_unset_boost_fg(void)
 	unset_user_space_global_cpuset(6);
 }
 
+static void boost_kick_cpus(void)
+{
+	int i;
+	struct cpumask kick_mask;
+	u32 nr_running;
+
+	if (sched_boost_type == SCHED_NO_BOOST)
+		return;
+
+	mutex_lock(&boost_mutex);
+
+	cpumask_andnot(&kick_mask, cpu_online_mask, cpu_isolated_mask);
+
+	for_each_cpu(i, &kick_mask) {
+		/*
+		 * kick only "small" cluster
+		 */
+		if (!is_max_capacity_cpu(i)) {
+			nr_running = READ_ONCE(cpu_rq(i)->nr_running);
+
+			/*
+			 * make sense to interrupt CPU if its run-queue
+			 * has something running in order to check for
+			 * migration afterwards, otherwise skip it.
+			 */
+			if (nr_running >= 1)
+				smp_send_reschedule(i);
+		}
+	}
+
+	mutex_unlock(&boost_mutex);
+}
+
 /* A mutex for scheduling boost switcher */
 static DEFINE_MUTEX(sched_boost_mutex);
 
 int set_sched_boost(unsigned int val)
 {
 	static unsigned int sysctl_sched_isolation_hint_enable_backup = -1;
+	int old_type = sched_boost_type;
 
 	if ((val < SCHED_NO_BOOST) || (val >= SCHED_UNKNOWN_BOOST))
 		return -1;
@@ -741,6 +777,13 @@ int set_sched_boost(unsigned int val)
 		sched_unset_boost_fg();
 
 	sched_boost_type = val;
+
+	/*
+	 * Kick low capacity CPUs to force immediate migration of tasks
+	 * onto high capcity CPUs.
+	 */
+	if (old_type != sched_boost_type)
+		boost_kick_cpus();
 
 	if (val == SCHED_NO_BOOST) {
 		if (sysctl_sched_isolation_hint_enable_backup > 0)
