@@ -14,9 +14,14 @@
 #include <linux/kernel.h>
 #include <linux/slab.h>
 #include <linux/init.h>
-#include <linux/fb.h>
 #include <linux/leds.h>
 #include "../leds.h"
+
+#if !defined(CONFIG_DRM_MEDIATEK)
+#include <linux/fb.h>
+#else
+#include <drm/mi_disp_notifier.h>
+#endif
 
 #define BLANK		1
 #define UNBLANK		0
@@ -29,6 +34,7 @@ struct bl_trig_notifier {
 	unsigned invert;
 };
 
+#if !defined(CONFIG_DRM_MEDIATEK)
 static int fb_notifier_callback(struct notifier_block *p,
 				unsigned long event, void *data)
 {
@@ -60,6 +66,48 @@ static int fb_notifier_callback(struct notifier_block *p,
 
 	return 0;
 }
+#else
+static int drm_notifier_callback(struct notifier_block *p,
+				unsigned long event, void *data)
+{
+	struct bl_trig_notifier *n = container_of(p,
+					struct bl_trig_notifier, notifier);
+	struct led_classdev *led = n->led;
+	struct mi_disp_notifier *evdata = data;
+	unsigned int *blank;
+	bool new_status;
+
+	/* If we aren't interested in this event, skip it immediately ... */
+	if (event != MI_DISP_DPMS_EVENT)
+		return 0;
+
+	if (evdata->disp_id != MI_DISPLAY_PRIMARY)
+		return 0;
+
+	blank = (unsigned int *)evdata->data;
+	if (*blank == MI_DISP_DPMS_ON)
+		new_status = UNBLANK;
+	else if (*blank == MI_DISP_DPMS_POWERDOWN)
+		new_status = BLANK;
+	else
+		/* ignore other events */
+		return 0;
+
+	if (new_status == n->old_status)
+		return 0;
+
+	if ((n->old_status == UNBLANK) ^ n->invert) {
+		n->brightness = led->brightness;
+		led_set_brightness_nosleep(led, LED_OFF);
+	} else {
+		led_set_brightness_nosleep(led, n->brightness);
+	}
+
+	n->old_status = new_status;
+
+	return 0;
+}
+#endif
 
 static ssize_t bl_trig_invert_show(struct device *dev,
 		struct device_attribute *attr, char *buf)
@@ -117,9 +165,17 @@ static void bl_trig_activate(struct led_classdev *led)
 	n->led = led;
 	n->brightness = led->brightness;
 	n->old_status = UNBLANK;
+#if !defined(CONFIG_DRM_MEDIATEK)
 	n->notifier.notifier_call = fb_notifier_callback;
+#else
+	n->notifier.notifier_call = drm_notifier_callback;
+#endif
 
+#if !defined(CONFIG_DRM_MEDIATEK)
 	ret = fb_register_client(&n->notifier);
+#else
+	ret = mi_disp_register_client(&n->notifier);
+#endif
 	if (ret)
 		dev_err(led->dev, "unable to register backlight trigger\n");
 	led->activated = true;
@@ -138,7 +194,11 @@ static void bl_trig_deactivate(struct led_classdev *led)
 
 	if (led->activated) {
 		device_remove_file(led->dev, &dev_attr_inverted);
+#if !defined(CONFIG_DRM_MEDIATEK)
 		fb_unregister_client(&n->notifier);
+#else
+		mi_disp_unregister_client(&n->notifier);
+#endif
 		kfree(n);
 		led->activated = false;
 	}
