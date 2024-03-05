@@ -250,48 +250,6 @@ static const struct mtk_lp_sysfs_op mtk_dbg_spm_spmfw_ver_fops = {
 	.fs_read = mtk_dbg_get_spmfw_version,
 };
 
-#define MD_SLEEP_INFO_SMEM_OFFEST (4)
-static ssize_t mtk_dbg_get_system_stats(char *ToUserBuf,
-			  size_t sz, void *priv)
-{
-	/* dump sleep info */
-#if defined(CONFIG_MTK_ECCCI_DRIVER)
-	u32 len = 0;
-	u32 *share_mem = NULL;
-	struct md_sleep_status md_data;
-
-	share_mem = (u32 *)get_smem_start_addr(MD_SYS1,
-		SMEM_USER_LOW_POWER, NULL);
-	memset(&md_data, 0, sizeof(struct md_sleep_status));
-	if (share_mem != NULL) {
-		share_mem = share_mem + MD_SLEEP_INFO_SMEM_OFFEST;
-		memcpy(&md_data, share_mem, sizeof(struct md_sleep_status));
-	}
-	len = snprintf(ToUserBuf, sz,
-	"26M:%lld:%lld.%03lld\nAP:%lld:%lld.%03lld\nMD:%lld:%lld.%03lld\n",
-	spm_26M_off_count,
-	PCM_TICK_TO_SEC(spm_26M_off_duration),
-	PCM_TICK_TO_SEC((spm_26M_off_duration % PCM_32K_TICKS_PER_SEC)
-		* 1000),
-	ap_pd_count,
-	PCM_TICK_TO_SEC(ap_slp_duration),
-	PCM_TICK_TO_SEC((ap_slp_duration % PCM_32K_TICKS_PER_SEC)
-		* 1000),
-	md_data.sleep_cnt,
-	PCM_TICK_TO_SEC(md_data.sleep_time),
-	PCM_TICK_TO_SEC((md_data.sleep_time % PCM_32K_TICKS_PER_SEC)
-		* 1000));
-
-	return (len > sz) ? sz : len;
-#else
-	return 0;
-#endif
-}
-
-static const struct mtk_lp_sysfs_op mtk_dbg_spm_system_stats_fops = {
-	.fs_read = mtk_dbg_get_system_stats,
-};
-
 static void mtk_dbg_spm_fs_init(void)
 {
 	mtk_spm_sysfs_root_entry_create();
@@ -302,8 +260,6 @@ static void mtk_dbg_spm_fs_init(void)
 			, &mtk_dbg_spm_last_debugflag_fops, NULL);
 	mtk_spm_sysfs_entry_node_add("spmfw_version", 0444
 			, &mtk_dbg_spm_spmfw_ver_fops, NULL);
-	mtk_spm_sysfs_entry_node_add("system_stats", 0444
-			, &mtk_dbg_spm_system_stats_fops, NULL);
 }
 
 static bool mtk_system_console_suspend;
