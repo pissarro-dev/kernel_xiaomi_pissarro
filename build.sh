@@ -47,10 +47,10 @@ mkdir -p out
 make O=out ARCH=arm64 "$DEFCONFIG"
 
 echo -e "\nStarting compilation...\n"
-if make -j$(nproc --all) O=out ARCH=arm64 CC="ccache clang" LLVM=1 LLVM_IAS=1 CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_ARM32=arm-linux-gnueabi- Image.gz dtbo.img; then
+if make -j$(nproc --all) O=out ARCH=arm64 CC="ccache clang" LLVM=1 LLVM_IAS=1 CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_ARM32=arm-linux-gnueabi- Image.gz; then
     echo -e "\nKernel compiled successfully! Zipping up...\n"
     clone_repo https://github.com/rio004/AnyKernel3 AnyKernel3
-    cp out/arch/arm64/boot/{Image.gz,dtbo.img} AnyKernel3
+    cp out/arch/arm64/boot/Image.gz AnyKernel3
     rm -rf *zip out/arch/arm64/boot
     (cd AnyKernel3 && zip -r9 "../$ZIPNAME" * -x '*.git*' README.md *placeholder)
     rm -rf AnyKernel3
